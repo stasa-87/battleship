@@ -14,5 +14,6 @@ class DemoController
     private $name = 'controller';
     public function indexAction(){
 echo 'demo/index';
+return 'something!!!';
     }
 }

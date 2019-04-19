@@ -14,5 +14,6 @@ class TestController
 
     public function testAction(){
 
+        return '<h1>ala bala!</h1>';
     }
 }
