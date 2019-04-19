@@ -1,0 +1,19 @@
+{
+    "name": "stasa/battleships",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "stanislav.yordanov",
+            "email": "smotlio87@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/routing": "^4.2",
+        "symfony/http-foundation": "^4.2",
+        "symfony/apache-pack": "^1.0"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.2"
+    }
+}
