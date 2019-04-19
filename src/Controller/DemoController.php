@@ -3,16 +3,16 @@
  * Created by PhpStorm.
  * User: stanislav.yordanov
  * Date: 19.4.2019 г.
- * Time: 15:34
+ * Time: 15:07
  */
 
 namespace App\Controller;
 
 
-class TestController
+class DemoController
 {
-
-    public function testAction(){
-
+    private $name = 'controller';
+    public function indexAction(){
+echo 'demo/index';
     }
 }
