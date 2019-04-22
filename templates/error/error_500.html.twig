@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Internal Server Error!{% endblock %}
+
+{% block content %}
+    <h1>Internal Server Error!</h1>
+    <h2>The server returned a "{{ status_text }}".</h2>
+
+    <p>
+        Something is broken. Please let us know what you were doing when this error occurred.
+        We will fix it as soon as possible. Sorry for any inconvenience caused.
+    </p>
+{% endblock %}

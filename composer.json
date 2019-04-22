@@ -10,7 +10,9 @@
     ],
     "require": {
         "symfony/routing": "^4.2",
-        "symfony/http-foundation": "^4.2"
+        "symfony/http-foundation": "^4.2",
+        "symfony/templating": "^4.2",
+        "twig/twig": "^2.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2"
