@@ -31,8 +31,10 @@ class GameController
         $board = new Board(10, 10, $ships);
         $board->init();
 
-        $board->shootAtPosition(0,0);
-        $board->shootAtPosition(1,1);
+//        $board->shootAll();
+//        $board->shootAtPosition(0,0);
+//        $board->shootAtPosition(1,1);
+//        $board->shootAtPosition(1,1);
         dump($board);
 
         return $this->render('game/index.html.twig');

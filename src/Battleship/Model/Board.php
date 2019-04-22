@@ -10,7 +10,9 @@ namespace App\Battleship\Model;
 
 
 use App\Battleship\Model\Exception\BoardCellAlreadyShotException;
+use App\Battleship\Model\Exception\InvalidBoardPositionException;
 use LogicException;
+use Throwable;
 
 class Board
 {
@@ -54,10 +56,14 @@ class Board
         $this->ships = $ships;
     }
 
+
     /**
      * Create the board and place the ships
+     *
+     * @return void
+     * @throws InvalidBoardPositionException
      */
-    public function init()
+    public function init(): void
     {
 
         for ($i = 0; $i <= $this->rows - 1; $i++) {
@@ -71,7 +77,92 @@ class Board
 
     }
 
-    protected function placeShipsOnBoard()
+    /**
+     * @return bool
+     */
+    public function loadBoard()
+    {
+
+        return true;
+    }
+
+    /**
+     * @return void
+     */
+    public function shootAll(): void
+    {
+
+        for ($i = 0; $i <= $this->rows - 1; $i++) {
+            for ($j = 0; $j <= $this->cols - 1; $j++) {
+
+                try {
+
+                    $this->shootAtPosition($i, $j);
+
+                } catch (Throwable $e) {
+
+                    //just catch the exception
+                }
+
+            }
+        }
+
+    }
+
+    /**
+     * @param int $row
+     * @param int $col
+     * @throws BoardCellAlreadyShotException
+     * @throws InvalidBoardPositionException
+     */
+    public function shootAtPosition(int $row, int $col): void
+    {
+
+        $this->validateBoardPosition($row, $col);
+
+        $boardCell = $this->getBoardCellAtPosition($row, $col);
+
+        if ($boardCell->isShot()) {
+            throw new BoardCellAlreadyShotException();
+        }
+
+        $boardCell->shoot();
+    }
+
+    /**
+     * @param int $row
+     * @param int $col
+     * @throws InvalidBoardPositionException
+     */
+    protected function validateBoardPosition(int $row, int $col): void
+    {
+        if ($row > ($this->rows - 1)) {
+            throw new InvalidBoardPositionException();
+        }
+
+        if ($col > ($this->cols - 1)) {
+            throw new InvalidBoardPositionException();
+        }
+    }
+
+    /**
+     * @param int $row
+     * @param int $col
+     * @return BoardCell
+     * @throws InvalidBoardPositionException
+     */
+    protected function getBoardCellAtPosition(int $row, int $col): BoardCell
+    {
+        $this->validateBoardPosition($row, $col);
+
+        return $this->board[$row][$col];
+    }
+
+    /**
+     * @return void
+     * @throws InvalidBoardPositionException
+     */
+    protected function placeShipsOnBoard(): void
     {
 
         while ($ships = $this->getNotPlacedShips()) {
@@ -154,45 +245,13 @@ class Board
      * @param int $row
      * @param int $col
      * @return bool
+     * @throws InvalidBoardPositionException
      */
     protected function hasShipAtPosition(int $row, int $col): bool
     {
-        //check board rows and cols
+        $this->validateBoardPosition($row, $col);
+
         return $this->getBoardCellAtPosition($row, $col)->hasShip();
-    }
-
-    /**
-     * @param int $row
-     * @param int $col
-     * @return BoardCell
-     */
-    protected function getBoardCellAtPosition(int $row, int $col): BoardCell
-    {
-        //check board rows and cols
-        return $this->board[$row][$col];
-    }
-
-    public function load()
-    {
-
-        return true;
-    }
-
-    /**
-     * @param int $row
-     * @param int $col
-     * @throws BoardCellAlreadyShotException
-     */
-    public function shootAtPosition(int $row, int $col): void
-    {
-        //check board rows and cols
-        $boardCell = $this->getBoardCellAtPosition($row, $col);
-
-        if($boardCell->isShot()){
-            throw new BoardCellAlreadyShotException();
-        }
-
-        $boardCell->shoot();
     }
 
 }
