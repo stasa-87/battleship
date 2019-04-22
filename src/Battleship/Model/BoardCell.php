@@ -24,4 +24,20 @@ class BoardCell
      * @var bool
      */
     protected $hasShip;
+
+    /**
+     * BoardCell constructor.
+     * @param int $state
+     * @param bool $hasShip
+     */
+    public function __construct(int $state, bool $hasShip)
+    {
+        $this->state = $state;
+        $this->hasShip = $hasShip;
+    }
+
+    public function shoot(): void
+    {
+        $this->state = self::BOARD_CELL_SHOT;
+    }
 }
