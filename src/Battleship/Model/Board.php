@@ -42,9 +42,9 @@ class Board
      * Board constructor.
      * @param int $rows
      * @param int $cols
-     * @param ShipInterface[] $ships
+     * @param array $ships
      */
-    public function __construct(int $rows, int $cols, ShipInterface ...$ships)
+    public function __construct(int $rows, int $cols, $ships)
     {
         $this->rows = $rows;
         $this->cols = $cols;
@@ -76,7 +76,7 @@ class Board
             $position = [
                 'row' => rand(0, $this->rows - 1),
                 'col' => rand(0, $this->cols - 1),
-                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0,1)]
+                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0, 1)],
             ];
 
             /**
@@ -88,7 +88,7 @@ class Board
     }
 
     /**
-     * @return array
+     * @return ShipInterface[]
      */
     protected function getNotPlacedShips(): array
     {
@@ -97,6 +97,10 @@ class Board
         }));
     }
 
+    protected function placeShip()
+    {
+    }
+    
     public function load()
     {
     }
