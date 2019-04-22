@@ -11,6 +11,9 @@ namespace App\Controller;
 
 use App\Battleship\Controller\ControllerTrait;
 use App\Battleship\Model\Board;
+use App\Battleship\Model\Exception\BoardCellAlreadyShotException;
+use App\Battleship\Model\Exception\InvalidBoardPositionException;
+use App\Battleship\Model\Exception\WrongCoordinatesFormatException;
 use App\Battleship\Model\HeavyShip;
 use App\Battleship\Model\LightShip;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,52 +26,85 @@ class GameController
     public function indexAction(Request $request)
     {
 
-        if (!$request->getSession()->has('battleship_game')) {
+        try {
 
-            $ships = [
-                new HeavyShip(false),
-                new LightShip(false),
-                new LightShip(false)
-            ];
+            if (!$request->getSession()->has('battleship_game')) {
 
-            $board = new Board(10, 10, $ships);
-            $board->init();
+                $ships = [
+                    new HeavyShip(false),
+                    new LightShip(false),
+                    new LightShip(false)
+                ];
 
-            $request->getSession()->set('battleship_game', serialize($board));
+                $board = new Board(10, 10, $ships);
+                $board->init();
 
-        } else {
+                $request->getSession()->set('battleship_game', serialize($board));
 
-            $board = unserialize($request->getSession()->get('battleship_game'));
+            } else {
+
+                $board = unserialize($request->getSession()->get('battleship_game'));
+            }
+
+        } catch (InvalidBoardPositionException $e) {
+
+            $request->getSession()->getFlashBag()->add('errors', 'This field does not exist, please choose one from the board!');
         }
 
-
-//        $board->shootAll();
-//        $board->shootAtPosition(0,0);
-//        $board->shootAtPosition(1,1);
-//        $board->shootAtPosition(1,1);
-        dump($board);
-
-
-
-        return $this->render('game/index.html.twig');
+        return $this->render('game/index.html.twig', [
+            'board' => $board,
+            'errors' => $request->getSession()->getFlashBag()->get('errors'),
+            'notification' => $request->getSession()->getFlashBag()->get('notification'),
+            'winMessage' => $request->getSession()->getFlashBag()->get('winMessage')
+        ]);
     }
 
     public function shootAction(Request $request)
     {
         $position = $request->request->getAlnum('position');
 
-        //regular expression check for one letter and one number
+        try {
 
-        $row = ord(strtolower($position[0])) - 97;
-        $col = (int) $position[1] - 1;
+            if(! preg_match("/^[a-zA-Z][1-9]$/", $position)){
+                throw new WrongCoordinatesFormatException();
+            }
 
-        /**
-         * @var $board Board
-         */
-        $board = unserialize($request->getSession()->get('battleship_game'));
-        $board->shootAtPosition($row, $col);
+            $row = ord(strtolower($position[0])) - 97;
+            $col = (int) $position[1] - 1;
 
-        $request->getSession()->set('battleship_game', serialize($board));
+            /**
+             * @var $board Board
+             */
+            $board = unserialize($request->getSession()->get('battleship_game'));
+            $board->shootAtPosition($row, $col);
+
+            if ($board->hasShipAtPosition($row, $col)) {
+
+                $request->getSession()->getFlashBag()->set('notification', '*** Sunk ***');
+            } else {
+
+                $request->getSession()->getFlashBag()->set('notification', '*** Miss ***');
+            }
+
+            if($board->checkWin()){
+                $winMessage = sprintf('Well done! You completed the game in %s shots.', $board->getTotalShots());
+                $request->getSession()->getFlashBag()->set('winMessage', $winMessage);
+            }
+
+            $request->getSession()->set('battleship_game', serialize($board));
+
+        } catch (BoardCellAlreadyShotException $e) {
+
+            $request->getSession()->getFlashBag()->add('errors', 'You have already shot at this field!');
+
+        } catch (InvalidBoardPositionException $e) {
+
+            $request->getSession()->getFlashBag()->add('errors', 'This field does not exist, please choose one from the board!');
+
+        } catch (WrongCoordinatesFormatException $e) {
+
+            $request->getSession()->getFlashBag()->add('errors', 'Wrong coordinates format!');
+        }
 
         return $this->redirectToRoute('game_index');
     }
@@ -88,6 +124,7 @@ class GameController
     public function resetAction(Request $request)
     {
         $request->getSession()->remove('battleship_game');
+
         return $this->redirectToRoute('game_index');
     }
 

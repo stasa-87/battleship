@@ -38,10 +38,10 @@ $context = new RequestContext();
 $context->fromRequest($request);
 
 $routes = new RouteCollection();
-$routes->add('game_index', new Route('/', ['_controller' => 'App\\Controller\\GameController::indexAction']));
-$routes->add('game_shoot', new Route('/shoot', ['_controller' => 'App\\Controller\\GameController::shootAction']));
-$routes->add('game_cheat', new Route('/cheat', ['_controller' => 'App\\Controller\\GameController::cheatAction']));
-$routes->add('game_reset', new Route('/reset', ['_controller' => 'App\\Controller\\GameController::resetAction']));
+$routes->add('game_index', new Route('/', ['_controller' => 'App\\Controller\\GameController::indexAction'], [], [], '', [], ['GET']));
+$routes->add('game_shoot', new Route('/shoot', ['_controller' => 'App\\Controller\\GameController::shootAction'], [], [], '', [], ['POST']));
+$routes->add('game_cheat', new Route('/cheat', ['_controller' => 'App\\Controller\\GameController::cheatAction'], [], [], '', [], ['POST']));
+$routes->add('game_reset', new Route('/reset', ['_controller' => 'App\\Controller\\GameController::resetAction'], [], [], '', [], ['POST']));
 
 $router = new UrlGenerator($routes, $context);
 $matcher = new UrlMatcher($routes, $context);
@@ -63,7 +63,7 @@ try {
     $controller = $controllerResolver->getController($request);
     if(in_array(ControllerTrait::class, class_uses($controller[0]))){
         $controller[0]->setTwig($twig);
-//        $controller[0]->setRouter($router);
+        $controller[0]->setRouter($router);
     }
 
     $arguments = $controllerResolver->getArguments($request, $controller);

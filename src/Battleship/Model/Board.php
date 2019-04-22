@@ -44,6 +44,21 @@ class Board
     private $ships = [];
 
     /**
+     * @var int
+     */
+    private $totalShipCells;
+
+    /**
+     * @var bool
+     */
+    private $cheat = false;
+
+    /**
+     * @var int
+     */
+    private $totalShots = 0;
+
+    /**
      * Board constructor.
      * @param int $rows
      * @param int $cols
@@ -54,8 +69,16 @@ class Board
         $this->rows = $rows;
         $this->cols = $cols;
         $this->ships = $ships;
-    }
 
+
+        $this->totalShipCells = array_reduce($ships, function ($carry, $ship){
+
+            /**
+             * @var $ship ShipInterface
+             */
+            return $carry + $ship->getSize();
+        });
+    }
 
     /**
      * Create the board and place the ships
@@ -78,32 +101,16 @@ class Board
     }
 
     /**
-     * @return bool
-     */
-    public function loadBoard()
-    {
-
-        return true;
-    }
-
-    /**
      * @return void
      */
     public function shootAll(): void
     {
+        $this->cheat = true;
 
         for ($i = 0; $i <= $this->rows - 1; $i++) {
             for ($j = 0; $j <= $this->cols - 1; $j++) {
 
-                try {
-
-                    $this->shootAtPosition($i, $j);
-
-                } catch (Throwable $e) {
-
-                    //just catch the exception
-                }
-
+                $this->shootAtPosition($i, $j);
             }
         }
 
@@ -122,27 +129,79 @@ class Board
 
         $boardCell = $this->getBoardCellAtPosition($row, $col);
 
-        if ($boardCell->isShot()) {
+        if ($boardCell->isShot() && !$this->cheat) {
             throw new BoardCellAlreadyShotException();
         }
 
         $boardCell->shoot();
+        $this->totalShots++;
+    }
+
+    /**
+     * @return bool
+     * @throws InvalidBoardPositionException
+     */
+    public function checkWin(): bool
+    {
+        return $this->countShotBoardCells() >= $this->totalShipCells;
     }
 
     /**
      * @param int $row
      * @param int $col
+     * @return bool
      * @throws InvalidBoardPositionException
      */
-    protected function validateBoardPosition(int $row, int $col): void
+    public function hasShipAtPosition(int $row, int $col): bool
     {
-        if ($row > ($this->rows - 1)) {
-            throw new InvalidBoardPositionException();
-        }
+        $this->validateBoardPosition($row, $col);
 
-        if ($col > ($this->cols - 1)) {
-            throw new InvalidBoardPositionException();
-        }
+        return $this->getBoardCellAtPosition($row, $col)->hasShip();
+    }
+
+    /**
+     * @param int $row
+     * @param int $col
+     * @return bool
+     * @throws InvalidBoardPositionException
+     */
+    public function isPositionHit(int $row, int $col): bool
+    {
+        $this->validateBoardPosition($row, $col);
+
+        return $this->getBoardCellAtPosition($row, $col)->isShot();
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalShots(): int
+    {
+        return $this->totalShots;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCheat(): bool
+    {
+        return $this->cheat;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRows(): int
+    {
+        return $this->rows;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCols(): int
+    {
+        return $this->cols;
     }
 
     /**
@@ -156,6 +215,22 @@ class Board
         $this->validateBoardPosition($row, $col);
 
         return $this->board[$row][$col];
+    }
+
+    /**
+     * @param int $row
+     * @param int $col
+     * @throws InvalidBoardPositionException
+     */
+    protected function validateBoardPosition(int $row, int $col): void
+    {
+        if ($row < 0 || $row > ($this->rows - 1)) {
+            throw new InvalidBoardPositionException();
+        }
+
+        if ($col < 0 || $col > ($this->cols - 1)) {
+            throw new InvalidBoardPositionException();
+        }
     }
 
     /**
@@ -242,16 +317,24 @@ class Board
     }
 
     /**
-     * @param int $row
-     * @param int $col
-     * @return bool
+     * @return int
      * @throws InvalidBoardPositionException
      */
-    protected function hasShipAtPosition(int $row, int $col): bool
+    protected function countShotBoardCells(): int
     {
-        $this->validateBoardPosition($row, $col);
+        $shotCells = 0;
 
-        return $this->getBoardCellAtPosition($row, $col)->hasShip();
+        for ($i = 0; $i <= $this->rows - 1; $i++) {
+            for ($j = 0; $j <= $this->cols - 1; $j++) {
+
+                $boardCell = $this->getBoardCellAtPosition($i, $j);
+                if($boardCell->hasShip() && $boardCell->isShot()){
+                    $shotCells++;
+                }
+
+            }
+        }
+
+        return $shotCells;
     }
-
 }

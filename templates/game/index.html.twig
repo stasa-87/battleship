@@ -4,10 +4,41 @@
 
 {% block content %}
 
-    Battleship Game!!!
+    <h3>Battleship Game</h3>
+
+    {% for error in errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
+
+    {{ notification[0]|default() }}
+
+    <div>
+
+        <table>
+            {% for row in range(0, board.getRows() - 1) %}
+                <tr>
+                {% for col in range(0, board.getCols() - 1) %}
+                    <td>
+                        {% if not board.isPositionHit(row, col) %}
+                            .
+                        {% elseif board.isPositionHit(row, col) and board.hasShipAtPosition(row, col) %}
+                            x
+                        {% elseif board.isPositionHit(row, col) and not board.hasShipAtPosition(row, col) and not board.isCheat() %}
+                            -
+                        {% elseif board.isPositionHit(row, col) and not board.hasShipAtPosition(row, col) and board.isCheat() %}
+
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    {{ winMessage[0]|default() }}
 
     <form method="post" action="{{ path('game_shoot') }}">
-        Enter coordinates (row, col), e.g. A5
+        Enter coordinates (row, col), e.g. A1
         <input name="position" type="text" size="2" maxlength="2" />
         <input type="submit" value="Shoot!">
     </form>
@@ -19,33 +50,6 @@
     <form method="post" action="{{ path('game_cheat') }}">
         <input type="submit" value="Cheat" />
     </form>
-
-{#
-    <pre>
-        {{ message }}
-
-        <table>
-            {% for rows, cols in game %}
-                <tr>
-                    {% for col in cols %}
-                        <td>{{ col }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
-
-        {{ messageWin }}
-    </pre>
-
-    <form method="post" action="./post">
-        Enter coordinates (row, col), e.g. A5 <input name="pos" type="text" size="2" maxlength="2"/>
-        <input type="submit" value="Submit">
-    </form>
-
-    <form method="post" action="./reset">
-        <input type="submit" value="Reset Game">
-    </form>
-#}
 
 {% endblock %}
 

@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: stanislav.yordanov
- * Date: 19.4.2019 г.
- * Time: 17:18
- */
 
 namespace App\Battleship\Controller;
 
-
 use Symfony\Component\HttpFoundation\Request;
+
 
 class ControllerResolver
 {
@@ -61,6 +55,26 @@ class ControllerResolver
     }
 
     /**
+     * @param Request $request
+     * @param $controller
+     * @return array
+     * @throws \ReflectionException
+     */
+    public function getArguments(Request $request, $controller)
+    {
+        if (is_array($controller)) {
+            $r = new \ReflectionMethod($controller[0], $controller[1]);
+        } elseif (is_object($controller) && !$controller instanceof \Closure) {
+            $r = new \ReflectionObject($controller);
+            $r = $r->getMethod('__invoke');
+        } else {
+            $r = new \ReflectionFunction($controller);
+        }
+
+        return $this->doGetArguments($request, $controller, $r->getParameters());
+    }
+
+    /**
      * Returns a callable for the given controller.
      *
      * @param string $controller A Controller string
@@ -94,26 +108,6 @@ class ControllerResolver
     protected function instantiateController($class)
     {
         return new $class();
-    }
-
-    /**
-     * @param Request $request
-     * @param $controller
-     * @return array
-     * @throws \ReflectionException
-     */
-    public function getArguments(Request $request, $controller)
-    {
-        if (is_array($controller)) {
-            $r = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller) && !$controller instanceof \Closure) {
-            $r = new \ReflectionObject($controller);
-            $r = $r->getMethod('__invoke');
-        } else {
-            $r = new \ReflectionFunction($controller);
-        }
-
-        return $this->doGetArguments($request, $controller, $r->getParameters());
     }
 
     /**

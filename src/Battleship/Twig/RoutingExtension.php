@@ -24,10 +24,12 @@ use Twig\TwigFunction;
 class RoutingExtension extends AbstractExtension
 {
     private $generator;
+
     public function __construct(UrlGeneratorInterface $generator)
     {
         $this->generator = $generator;
     }
+
     /**
      * Returns a list of functions to add to the existing list.
      *
@@ -51,6 +53,7 @@ class RoutingExtension extends AbstractExtension
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
+
     /**
      * @param string $name
      * @param array  $parameters
@@ -62,6 +65,7 @@ class RoutingExtension extends AbstractExtension
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }
+
     /**
      * Determines at compile time whether the generated URL will be safe and thus
      * saving the unneeded automatic escaping for performance reasons.
@@ -99,6 +103,7 @@ class RoutingExtension extends AbstractExtension
         }
         return [];
     }
+
     /**
      * {@inheritdoc}
      */
