@@ -4,12 +4,16 @@ da opravq kontrolerite - da se dostupvat samo po post,get,ajax!!!
 battleship logic!!!
 validations!!!
 
+view helperi!!!
+game service!!!
 UI!!!
 assets!!!
 
 da zachistq stariq kod - rutove, modeli, templeiti eventualno assets, @author komentari ot ide-to
 
 coding standarts - https://symfony.com/doc/current/contributing/code/standards.html
+
+interfaces - php 7.2 return types
 
 ARRAY OF OBJECTS
 /**

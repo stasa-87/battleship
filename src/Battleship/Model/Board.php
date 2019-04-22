@@ -9,6 +9,9 @@
 namespace App\Battleship\Model;
 
 
+use App\Battleship\Model\Exception\BoardCellAlreadyShotException;
+use LogicException;
+
 class Board
 {
 
@@ -71,18 +74,68 @@ class Board
     protected function placeShipsOnBoard()
     {
 
-        while ($this->getNotPlacedShips()) {
+        while ($ships = $this->getNotPlacedShips()) {
 
             $position = [
                 'row' => rand(0, $this->rows - 1),
                 'col' => rand(0, $this->cols - 1),
-                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0, 1)],
+                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0, 0)],
             ];
 
+            $ship = $ships[0];
+
+            $emptyBoardCells = [];
+            if ($position['orientation'] == self::BOARD_ORIENTATION_HORIZONTAL) {
+
+                //check if we can place the ship on the board
+                if (($position['col'] + $ship->getSize()) > $this->cols) {
+                    continue;
+                }
+
+                //check if there are already placed ships
+                foreach (range($position['col'], $position['col'] + $ship->getSize() - 1) as $col) {
+
+                    if ($this->hasShipAtPosition($position['row'], $col)) {
+                        continue 2;
+                    }
+
+                    $emptyBoardCells[] = $this->getBoardCellAtPosition($position['row'], $col);
+                }
+
+            } elseif ($position['orientation'] == self::BOARD_ORIENTATION_VERTICAL) {
+
+                //check if we can place the ship on the board
+                if (($position['row'] + $ship->getSize()) > $this->rows) {
+                    continue;
+                }
+
+                //check if there are already placed ships
+                foreach (range($position['row'], $position['row'] + $ship->getSize() - 1) as $row) {
+
+                    if ($this->hasShipAtPosition($row, $position['col'])) {
+                        continue 2;
+                    }
+
+                    $emptyBoardCells[] = $this->getBoardCellAtPosition($row, $position['col']);
+                }
+
+            } else {
+
+                $msg = sprintf('The available board orientations are %s. But you have provided "%s".',
+                    join(' and ', self::BOAR_ORIENTATION_LIST), $position['orientation']);
+
+                throw new LogicException($msg);
+            }
+
+
             /**
-             * @var $ship ShipInterface
+             * @var $boardCell BoardCell
              */
-            $ship = $this->getNotPlacedShips()[0];
+            foreach ($emptyBoardCells as $boardCell) {
+
+                $boardCell->placeShip();
+            }
+
             $ship->setIsPlaced(true);
         }
     }
@@ -97,16 +150,49 @@ class Board
         }));
     }
 
-    protected function placeShip()
+    /**
+     * @param int $row
+     * @param int $col
+     * @return bool
+     */
+    protected function hasShipAtPosition(int $row, int $col): bool
     {
-    }
-    
-    public function load()
-    {
+        //check board rows and cols
+        return $this->getBoardCellAtPosition($row, $col)->hasShip();
     }
 
-    protected function hasShipAtPositions()
+    /**
+     * @param int $row
+     * @param int $col
+     * @return BoardCell
+     */
+    protected function getBoardCellAtPosition(int $row, int $col): BoardCell
     {
+        //check board rows and cols
+        return $this->board[$row][$col];
+    }
+
+    public function load()
+    {
+
+        return true;
+    }
+
+    /**
+     * @param int $row
+     * @param int $col
+     * @throws BoardCellAlreadyShotException
+     */
+    public function shootAtPosition(int $row, int $col): void
+    {
+        //check board rows and cols
+        $boardCell = $this->getBoardCellAtPosition($row, $col);
+
+        if($boardCell->isShot()){
+            throw new BoardCellAlreadyShotException();
+        }
+
+        $boardCell->shoot();
     }
 
 }
