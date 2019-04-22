@@ -35,7 +35,13 @@ class GameController
 //        $board->shootAtPosition(0,0);
 //        $board->shootAtPosition(1,1);
 //        $board->shootAtPosition(1,1);
-        dump($board);
+//        dump($board);
+//
+//        $ser = serialize($board);
+//        dump($ser);
+//
+//        $deser = unserialize($ser);
+//        dump($deser);
 
         return $this->render('game/index.html.twig');
     }
