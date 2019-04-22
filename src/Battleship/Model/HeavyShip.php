@@ -13,10 +13,12 @@ class HeavyShip extends AbstractShip
 {
 
     /**
-     * LightShip constructor.
+     * HeavyShip constructor.
+     * @param bool $isPlaced
      */
-    public function __construct()
+    public function __construct(bool $isPlaced)
     {
-        parent::__construct(5);
+        parent::__construct(5, $isPlaced);
     }
+
 }

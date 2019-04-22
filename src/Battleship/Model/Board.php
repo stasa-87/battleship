@@ -12,31 +12,97 @@ namespace App\Battleship\Model;
 class Board
 {
 
-    const BOARD_ROWS = 10;
-    const BOARD_COLS = 10;
+    const BOARD_ORIENTATION_HORIZONTAL = 1;
+
+    const BOARD_ORIENTATION_VERTICAL = 2;
+
+    const BOAR_ORIENTATION_LIST = [self::BOARD_ORIENTATION_HORIZONTAL, self::BOARD_ORIENTATION_VERTICAL];
+
+    /**
+     * @var int
+     */
+    protected $rows;
+
+    /**
+     * @var int
+     */
+    protected $cols;
 
     /**
      * @var array
      */
-    protected $board;
+    private $board = [];
+
+    /**
+     * @var array
+     */
+    private $ships = [];
 
     /**
      * Board constructor.
-     * @param array $board
+     * @param int $rows
+     * @param int $cols
+     * @param ShipInterface[] $ships
      */
-    public function __construct(array $board)
+    public function __construct(int $rows, int $cols, ShipInterface ...$ships)
     {
-        $this->board = $board;
+        $this->rows = $rows;
+        $this->cols = $cols;
+        $this->ships = $ships;
     }
 
-
-    public function placeShip(ShipInterface $ship)
+    /**
+     * Create the board and place the ships
+     */
+    public function init()
     {
+
+        for ($i = 0; $i <= $this->rows - 1; $i++) {
+            for ($j = 0; $j <= $this->cols - 1; $j++) {
+
+                $this->board[$i][$j] = new BoardCell(BoardCell::BOARD_CELL_NOT_SHOT, false);
+            }
+        }
+
+        $this->placeShipsOnBoard();
 
     }
 
-    public function hasShipAtPosition()
+    protected function placeShipsOnBoard()
     {
 
+        while ($this->getNotPlacedShips()) {
+
+            $position = [
+                'row' => rand(0, $this->rows - 1),
+                'col' => rand(0, $this->cols - 1),
+                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0,1)]
+            ];
+
+            /**
+             * @var $ship ShipInterface
+             */
+            $ship = $this->getNotPlacedShips()[0];
+            $ship->setIsPlaced(true);
+        }
     }
+
+    /**
+     * @return array
+     */
+    protected function getNotPlacedShips(): array
+    {
+        return array_values(array_filter($this->ships, function (ShipInterface $ship) {
+            return $ship->isPlaced() === false;
+        }));
+    }
+
+    public function load()
+    {
+    }
+
+    protected function hasShipAtPositions()
+    {
+    }
+
 }

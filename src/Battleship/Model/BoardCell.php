@@ -40,4 +40,26 @@ class BoardCell
     {
         $this->state = self::BOARD_CELL_SHOT;
     }
+
+    public function placeShip(): void
+    {
+        $this->hasShip = true;
+    }
+
+    /**
+     * @return int
+     */
+    public function getState(): int
+    {
+        return $this->state;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasShip(): bool
+    {
+        return $this->hasShip;
+    }
+
 }
