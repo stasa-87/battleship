@@ -5,6 +5,21 @@
 {% block content %}
 
     Battleship Game!!!
+
+    <form method="post" action="{{ path('game_shoot') }}">
+        Enter coordinates (row, col), e.g. A5
+        <input name="position" type="text" size="2" maxlength="2" />
+        <input type="submit" value="Shoot!">
+    </form>
+
+    <form method="post" action="{{ path('game_reset') }}">
+        <input type="submit" value="New Game" />
+    </form>
+
+    <form method="post" action="{{ path('game_cheat') }}">
+        <input type="submit" value="Cheat" />
+    </form>
+
 {#
     <pre>
         {{ message }}

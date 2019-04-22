@@ -12,13 +12,10 @@ namespace App\Battleship\Model;
 class BoardCell
 {
 
-    const BOARD_CELL_NOT_SHOT = 1;
-    const BOARD_CELL_SHOT = 2;
-
     /**
-     * @var int
+     * @var bool
      */
-    protected $state;
+    protected $isShot;
 
     /**
      * @var bool
@@ -27,12 +24,13 @@ class BoardCell
 
     /**
      * BoardCell constructor.
-     * @param int $state
+     *
+     * @param bool $isShot
      * @param bool $hasShip
      */
-    public function __construct(int $state, bool $hasShip)
+    public function __construct(bool $isShot, bool $hasShip)
     {
-        $this->state = $state;
+        $this->isShot = $isShot;
         $this->hasShip = $hasShip;
     }
 
@@ -41,7 +39,7 @@ class BoardCell
      */
     public function shoot(): void
     {
-        $this->state = self::BOARD_CELL_SHOT;
+        $this->isShot = true;
     }
 
     /**
@@ -49,7 +47,7 @@ class BoardCell
      */
     public function isShot(): bool
     {
-        return $this->state === self::BOARD_CELL_SHOT;
+        return $this->isShot;
     }
 
     /**

@@ -6,7 +6,13 @@ battleship logic - save and load the game!!!
 game service and validations!!!
 view helperi!!!
 UI!!!
+error message
+ui notification messagese (flashbag)
 assets!!!
+
+validaciq na shoot poleto!!!
+
+da generiram routove za formite i assetite
 
 da zachistq stariq kod - rutove, modeli, templeiti eventualno assets, @author komentari ot ide-to
 

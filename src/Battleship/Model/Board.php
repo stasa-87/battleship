@@ -69,7 +69,7 @@ class Board
         for ($i = 0; $i <= $this->rows - 1; $i++) {
             for ($j = 0; $j <= $this->cols - 1; $j++) {
 
-                $this->board[$i][$j] = new BoardCell(BoardCell::BOARD_CELL_NOT_SHOT, false);
+                $this->board[$i][$j] = new BoardCell(false, false);
             }
         }
 
