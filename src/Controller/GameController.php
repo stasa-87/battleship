@@ -43,7 +43,7 @@ class GameController
 
         try {
 
-            if(! preg_match("/^[a-zA-Z][1-9]$/", $position)){
+            if(! preg_match("/^[a-zA-Z]\d{1,2}$/", $position)){
                 throw new WrongCoordinatesFormatException();
             }
 
@@ -77,7 +77,7 @@ class GameController
     {
 
         $battleshipGame->reset();
-        
+
         return $this->redirectToRoute('game_index');
     }
 
