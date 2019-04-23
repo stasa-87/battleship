@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Stasa
- * Date: 22.4.2019 г.
- * Time: 21:22
- */
 
 namespace App\Battleship\Twig;
 

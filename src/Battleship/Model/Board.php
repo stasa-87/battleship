@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Stasa
- * Date: 21.4.2019 г.
- * Time: 23:29
- */
 
 namespace App\Battleship\Model;
 
