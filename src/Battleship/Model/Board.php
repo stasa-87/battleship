@@ -96,8 +96,6 @@ class Board
 
     /**
      * @return void
-     * @throws BoardCellAlreadyShotException
-     * @throws InvalidBoardPositionException
      */
     public function shootAll(): void
     {

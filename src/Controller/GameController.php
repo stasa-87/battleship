@@ -4,12 +4,10 @@ namespace App\Controller;
 
 
 use App\Battleship\Controller\ControllerTrait;
-use App\Battleship\Model\Board;
 use App\Battleship\Model\Exception\BoardCellAlreadyShotException;
 use App\Battleship\Model\Exception\InvalidBoardPositionException;
 use App\Battleship\Model\Exception\WrongCoordinatesFormatException;
-use App\Battleship\Model\HeavyShip;
-use App\Battleship\Model\LightShip;
+use App\Battleship\Service\BattleshipGameService;
 use Symfony\Component\HttpFoundation\Request;
 
 class GameController
@@ -17,59 +15,14 @@ class GameController
 
     use ControllerTrait;
 
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, BattleshipGameService $battleshipGame)
     {
 
         try {
 
-            if (!$request->getSession()->has('battleship_game')) {
+            $board = $battleshipGame->startGame();
 
-                $ships = [
-                    new HeavyShip(false),
-                    new LightShip(false),
-                    new LightShip(false)
-                ];
-
-                $board = new Board(10, 10, ...$ships);
-                $board->init();
-
-                $request->getSession()->set('battleship_game', serialize($board));
-
-            } else {
-
-                $board = unserialize($request->getSession()->get('battleship_game'));
-            }
-
-            $boardView = [];
-            for ($i = 0; $i <= $board->getRows(); $i++) {
-                for ($j = 0; $j <= $board->getCols(); $j++) {
-
-                    if($i == 0 && $j == 0) {
-
-                        $cellView = '#';
-                    } elseif($i == 0){
-
-                        $cellView = $j;
-                    } elseif($j == 0){
-
-                        $cellView = range('A', 'Z')[$i-1];
-                    } else {
-
-                        $cellView = null;
-                        if(! $board->isPositionHit($i-1, $j-1)){
-                            $cellView = '.';
-                        } else if($board->isPositionHit($i-1, $j-1) && $board->hasShipAtPosition($i-1, $j-1)){
-                            $cellView = 'x';
-                        } else if($board->isPositionHit($i-1, $j-1) && ! $board->hasShipAtPosition($i-1, $j-1) && ! $board->isCheat()){
-                            $cellView = '-';
-                        } else if($board->isPositionHit($i-1, $j-1) && ! $board->hasShipAtPosition($i-1, $j-1) && $board->isCheat()){
-                            $cellView = ' ';
-                        }
-                    }
-
-                    $boardView[$i][$j] = $cellView;
-                }
-            }
+            $boardView = $battleshipGame->getBoardView($board);
 
         } catch (InvalidBoardPositionException $e) {
 
@@ -77,14 +30,14 @@ class GameController
         }
 
         return $this->render('game/index.html.twig', [
-            'boardView' => $boardView,
+            'boardView' => $boardView ?? null,
             'errors' => $request->getSession()->getFlashBag()->get('errors'),
             'notification' => $request->getSession()->getFlashBag()->get('notification'),
             'winMessage' => $request->getSession()->getFlashBag()->get('winMessage')
         ]);
     }
 
-    public function shootAction(Request $request)
+    public function shootAction(Request $request, BattleshipGameService $battleshipGame)
     {
         $position = $request->request->getAlnum('position');
 
@@ -94,29 +47,7 @@ class GameController
                 throw new WrongCoordinatesFormatException();
             }
 
-            $row = ord(strtolower($position[0])) - 97;
-            $col = (int) $position[1] - 1;
-
-            /**
-             * @var $board Board
-             */
-            $board = unserialize($request->getSession()->get('battleship_game'));
-            $board->shootAtPosition($row, $col);
-
-            if ($board->hasShipAtPosition($row, $col)) {
-
-                $request->getSession()->getFlashBag()->set('notification', '*** Sunk ***');
-            } else {
-
-                $request->getSession()->getFlashBag()->set('notification', '*** Miss ***');
-            }
-
-            if($board->checkWin()){
-                $winMessage = sprintf('Well done! You completed the game in %s shots.', $board->getTotalShots());
-                $request->getSession()->getFlashBag()->set('winMessage', $winMessage);
-            }
-
-            $request->getSession()->set('battleship_game', serialize($board));
+            $battleshipGame->shoot($position);
 
         } catch (BoardCellAlreadyShotException $e) {
 
@@ -134,14 +65,10 @@ class GameController
         return $this->redirectToRoute('game_index');
     }
 
-    public function cheatAction(Request $request)
+    public function cheatAction(BattleshipGameService $battleshipGame)
     {
-        /**
-         * @var $board Board
-         */
-        $board = unserialize($request->getSession()->get('battleship_game'));
-        $board->shootAll();
-        $request->getSession()->set('battleship_game', serialize($board));
+
+        $battleshipGame->cheat();
 
         return $this->redirectToRoute('game_index');
     }

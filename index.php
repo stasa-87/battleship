@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 
 use App\Battleship\Controller\ControllerResolver;
 use App\Battleship\Controller\ControllerTrait;
+use App\Battleship\Service\BattleshipGameService;
 use App\Battleship\Twig\RoutingExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,10 +50,13 @@ $twig = new Environment($loader, [
 $twig->addExtension(new DebugExtension());
 $twig->addExtension(new RoutingExtension($router));
 
+$battleshipGame = new BattleshipGameService($request->getSession());
+
 try {
 
     $routerParameters = $matcher->matchRequest($request);
     $request->attributes->add($routerParameters);
+    $request->attributes->add(['battleshipGame' => $battleshipGame]);
 
     $controller = $controllerResolver->getController($request);
     if(in_array(ControllerTrait::class, class_uses($controller[0]))){
