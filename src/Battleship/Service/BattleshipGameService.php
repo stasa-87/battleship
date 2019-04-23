@@ -120,12 +120,12 @@ class BattleshipGameService
     }
 
     /**
-     * @param int $row
+     * @param string $row
      * @param int $col
      * @throws BoardCellAlreadyShotException
      * @throws InvalidBoardPositionException
      */
-    public function shoot(int $row, int $col): void
+    public function shoot(string $row, int $col): void
     {
         $row = ord(strtolower($row)) - 97;
         $col = (int)$col - 1;
