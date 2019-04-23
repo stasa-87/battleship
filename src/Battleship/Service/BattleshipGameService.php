@@ -127,7 +127,7 @@ class BattleshipGameService
     public function shoot(string $position): void
     {
         $row = ord(strtolower($position[0])) - 97;
-        $col = (int) $position[1] - 1;
+        $col = (int)$position[1] - 1;
 
         /**
          * @var $board Board
@@ -143,12 +143,20 @@ class BattleshipGameService
             $this->session->getFlashBag()->set('notification', '*** Miss ***');
         }
 
-        if($board->checkWin()){
+        if ($board->checkWin()) {
             $winMessage = sprintf('Well done! You completed the game in %s shots.', $board->getTotalShots());
             $this->session->getFlashBag()->set('winMessage', $winMessage);
         }
 
         $this->session->set('battleship_game', serialize($board));
+    }
+
+    /**
+     * @return void
+     */
+    public function reset(): void
+    {
+        $this->session->remove('battleship_game');
     }
 
 }

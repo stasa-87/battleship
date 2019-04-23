@@ -73,10 +73,11 @@ class GameController
         return $this->redirectToRoute('game_index');
     }
 
-    public function resetAction(Request $request)
+    public function resetAction(BattleshipGameService $battleshipGame)
     {
-        $request->getSession()->remove('battleship_game');
 
+        $battleshipGame->reset();
+        
         return $this->redirectToRoute('game_index');
     }
 
