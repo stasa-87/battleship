@@ -4,52 +4,103 @@
 
 {% block content %}
 
-    <h3>Battleship Game</h3>
-
-    {% for error in errors %}
-        <p>{{ error }}</p>
-    {% endfor %}
-
-    {{ notification[0]|default() }}
-
-    <div>
-
-        <table>
-            {% for row in range(0, board.getRows() - 1) %}
-                <tr>
-                {% for col in range(0, board.getCols() - 1) %}
-                    <td>
-                        {% if not board.isPositionHit(row, col) %}
-                            .
-                        {% elseif board.isPositionHit(row, col) and board.hasShipAtPosition(row, col) %}
-                            x
-                        {% elseif board.isPositionHit(row, col) and not board.hasShipAtPosition(row, col) and not board.isCheat() %}
-                            -
-                        {% elseif board.isPositionHit(row, col) and not board.hasShipAtPosition(row, col) and board.isCheat() %}
-
-                        {% endif %}
-                    </td>
-                {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
+    <div class="row">
+        <div class="col">
+            <h1>Battleship Game</h1>
+        </div>
     </div>
 
-    {{ winMessage[0]|default() }}
+    <div class="row">
+        <div class="col">
+            {% if errors is not empty %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 
-    <form method="post" action="{{ path('game_shoot') }}">
-        Enter coordinates (row, col), e.g. A1
-        <input name="position" type="text" size="2" maxlength="2" />
-        <input type="submit" value="Shoot!">
-    </form>
+    <div class="row">
+        <div class="col">
+            {% if notification is not empty %}
+                <div class="alert alert-warning" role="alert">
+                    {{ notification[0]|default() }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 
-    <form method="post" action="{{ path('game_reset') }}">
-        <input type="submit" value="New Game" />
-    </form>
+    <div class="row">
+        <div class="col">
 
-    <form method="post" action="{{ path('game_cheat') }}">
-        <input type="submit" value="Cheat" />
-    </form>
+            <table class="table table-sm table-bordered">
+                <tbody>
+                {% for row in boardView %}
+                    <tr>
+                        {% for text in row %}
+                            {% if loop.parent.loop.first or loop.first %}
+                                <th>{{ text }}</th>
+                            {% else %}
+                                <td>{{ text }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="col-6"></div>
+        <div class="col"></div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            {% if winMessage is not empty %}
+                <div class="alert alert-success" role="alert">
+                    {{ winMessage[0]|default() }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <form class="form-inline" method="post" action="{{ path('game_shoot') }}" >
+                <div class="form-group mb-2">
+                    Enter coordinates (row, col), e.g. A1
+
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="position" class="sr-only">Password</label>
+                    <input class="form-control" id="position" placeholder="A1" type="text" name="position" size="2" maxlength="2" >
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Shoot!</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-3">
+            <div class="row">
+                <div class="col">
+
+                    <form method="post" action="{{ path('game_reset') }}">
+                        <input class="btn btn-warning" type="submit" value="New Game"/>
+                    </form>
+                </div>
+
+                <div class="col">
+
+                    <form method="post" action="{{ path('game_cheat') }}">
+                        <input class="btn btn-danger" type="submit" value="Cheat"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

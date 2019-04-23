@@ -36,7 +36,7 @@ class GameController
                     new LightShip(false)
                 ];
 
-                $board = new Board(10, 10, $ships);
+                $board = new Board(10, 10, ...$ships);
                 $board->init();
 
                 $request->getSession()->set('battleship_game', serialize($board));
@@ -46,13 +46,44 @@ class GameController
                 $board = unserialize($request->getSession()->get('battleship_game'));
             }
 
+            $boardView = [];
+            for ($i = 0; $i <= $board->getRows(); $i++) {
+                for ($j = 0; $j <= $board->getCols(); $j++) {
+
+                    if($i == 0 && $j == 0) {
+
+                        $cellView = '#';
+                    } elseif($i == 0){
+
+                        $cellView = $j;
+                    } elseif($j == 0){
+
+                        $cellView = range('A', 'Z')[$i-1];
+                    } else {
+
+                        $cellView = null;
+                        if(! $board->isPositionHit($i-1, $j-1)){
+                            $cellView = '.';
+                        } else if($board->isPositionHit($i-1, $j-1) && $board->hasShipAtPosition($i-1, $j-1)){
+                            $cellView = 'x';
+                        } else if($board->isPositionHit($i-1, $j-1) && ! $board->hasShipAtPosition($i-1, $j-1) && ! $board->isCheat()){
+                            $cellView = '-';
+                        } else if($board->isPositionHit($i-1, $j-1) && ! $board->hasShipAtPosition($i-1, $j-1) && $board->isCheat()){
+                            $cellView = ' ';
+                        }
+                    }
+
+                    $boardView[$i][$j] = $cellView;
+                }
+            }
+
         } catch (InvalidBoardPositionException $e) {
 
             $request->getSession()->getFlashBag()->add('errors', 'This field does not exist, please choose one from the board!');
         }
 
         return $this->render('game/index.html.twig', [
-            'board' => $board,
+            'boardView' => $boardView,
             'errors' => $request->getSession()->getFlashBag()->get('errors'),
             'notification' => $request->getSession()->getFlashBag()->get('notification'),
             'winMessage' => $request->getSession()->getFlashBag()->get('winMessage')

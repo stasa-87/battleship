@@ -62,9 +62,9 @@ class Board
      * Board constructor.
      * @param int $rows
      * @param int $cols
-     * @param array $ships
+     * @param ShipInterface[] $ships
      */
-    public function __construct(int $rows, int $cols, $ships)
+    public function __construct(int $rows, int $cols, ShipInterface ...$ships)
     {
         $this->rows = $rows;
         $this->cols = $cols;
@@ -102,6 +102,8 @@ class Board
 
     /**
      * @return void
+     * @throws BoardCellAlreadyShotException
+     * @throws InvalidBoardPositionException
      */
     public function shootAll(): void
     {
@@ -245,7 +247,7 @@ class Board
             $position = [
                 'row' => rand(0, $this->rows - 1),
                 'col' => rand(0, $this->cols - 1),
-                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0, 0)],
+                'orientation' => self::BOAR_ORIENTATION_LIST[rand(0, 1)],
             ];
 
             $ship = $ships[0];

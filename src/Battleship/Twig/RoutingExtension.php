@@ -40,8 +40,10 @@ class RoutingExtension extends AbstractExtension
         return [
             new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
             new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
+            new TwigFunction('absolute_url', [$this, 'generateAbsoluteUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
         ];
     }
+
     /**
      * @param string $name
      * @param array  $parameters
@@ -102,6 +104,38 @@ class RoutingExtension extends AbstractExtension
             return ['html'];
         }
         return [];
+    }
+
+    /**
+     * Returns the absolute URL for the given absolute or relative path.
+     *
+     * This method returns the path unchanged if no request is available.
+     *
+     * @param string $path The path
+     *
+     * @return string The absolute URL
+     *
+     * @see Request::getUriForPath()
+     */
+    public function generateAbsoluteUrl($path)
+    {
+        $context = $this->generator->getContext();
+
+        $schemeAuthority = '';
+        $host = $context->getHost();
+        $scheme = $context->getScheme();
+
+        $port = '';
+        if ('http' === $scheme && 80 != $context->getHttpPort()) {
+            $port = ':'.$context->getHttpPort();
+        } elseif ('https' === $scheme && 443 != $context->getHttpsPort()) {
+            $port = ':'.$context->getHttpsPort();
+        }
+
+        $schemeAuthority = "$scheme://";
+        $schemeAuthority .= $host.$port;
+
+        return $schemeAuthority.$context->getBaseUrl().$path;
     }
 
     /**
