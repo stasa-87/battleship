@@ -43,11 +43,11 @@ class GameController
 
         try {
 
-            if(! preg_match("/^[a-zA-Z]\d{1,2}$/", $position)){
+            if(! $position = preg_match("/^([a-zA-Z])(\d{1,2})$/", $position, $matches)){
                 throw new WrongCoordinatesFormatException();
             }
 
-            $battleshipGame->shoot($position);
+            $battleshipGame->shoot($matches[1], $matches[2]);
 
         } catch (BoardCellAlreadyShotException $e) {
 
